@@ -132,8 +132,16 @@ def extrage_text_video(cale_video, model_size=None):
 
     except Exception as e:
         print(f"Eroare la transcriere: {e}")
+        # Curățenie înainte de a re-raise
+        if os.path.exists(temp_audio_path):
+            try:
+                os.remove(temp_audio_path)
+            except:
+                pass
+        # Re-raise excepția pentru a notifica codul apelant
+        raise
     finally:
-        # Curățenie
+        # Curățenie finală (dacă nu a fost făcută în except)
         if os.path.exists(temp_audio_path):
             try:
                 os.remove(temp_audio_path)
