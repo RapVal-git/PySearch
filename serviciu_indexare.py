@@ -2,9 +2,9 @@ import time
 import os
 import schedule
 from indexare_incrementala import indexare_incrementala
-
+import config
 # Citește calea din variabilă de mediu
-FOLDER_PDF = os.getenv('FOLDER_PDF', r"\\192.168.27.44\it\copy cosmin creta\Documentatie\Documentatie lucru")
+FOLDER_PDF = config.DEFAULT_INDEXING_FOLDER
 
 def job():
     """Functie care ruleaza indexarea incrementala"""

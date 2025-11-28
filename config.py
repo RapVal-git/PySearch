@@ -26,7 +26,7 @@ QDRANT_PATH = os.getenv("QDRANT_PATH", str(BASE_DIR / "qdrant_db"))
 # Folder implicit pentru indexare (poate fi suprascris)
 DEFAULT_INDEXING_FOLDER = os.getenv(
     "INDEXING_FOLDER", 
-    r"\\192.168.27.44\ERP-implementare\Specificatii de lucru"
+    r"C:\Users\IT\Desktop\Folder test"
 )
 
 # Fișier pentru tracking documente indexate
