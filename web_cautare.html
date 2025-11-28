@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 PyPro Search & Chat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Tabs Styling */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 12px 30px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 30px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(5px);
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: #764ba2;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Search Box Styling */
+        .search-box {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+        }
+
+        .search-input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 16px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        select {
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        button.primary-btn {
+            padding: 16px 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button.primary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        button.primary-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Results Styling */
+        .status {
+            text-align: center;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .status.loading {
+            background: #fef3c7;
+            color: #92400e;
+            display: block;
+        }
+
+        .status.success {
+            background: #d1fae5;
+            color: #065f46;
+            display: block;
+        }
+
+        .status.error {
+            background: #fee2e2;
+            color: #991b1b;
+            display: block;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            transition: transform 0.2s;
+        }
+
+        .result-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .result-score {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .result-meta {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        /* Chat Styling */
+        .chat-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            height: 70vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-history {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 15px;
+            border-radius: 15px;
+            line-height: 1.5;
+            position: relative;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message.ai {
+            align-self: flex-start;
+            background: white;
+            color: #1e293b;
+            border: 1px solid #e2e8f0;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .chat-input-area {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 10px;
+        }
+
+        .sources-list {
+            margin-top: 10px;
+            font-size: 12px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .source-tag {
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.05);
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        .loading-dots:after {
+            content: '.';
+            animation: dots 1.5s steps(5, end) infinite;
+        }
+
+        @keyframes dots {
+
+            0%,
+            20% {
+                content: '.';
+            }
+
+            40% {
+                content: '..';
+            }
+
+            60% {
+                content: '...';
+            }
+
+            80%,
+            100% {
+                content: '';
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>PyPro Search & Chat</h1>
+            <p>Platformă inteligentă de căutare în documente</p>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('search')">🔍 Căutare Documente</button>
+            <button class="tab-btn" onclick="switchTab('chat')">💬 Chat cu AI</button>
+        </div>
+
+        <!-- Search Tab Content -->
+        <div id="search-tab" class="tab-content active">
+            <div class="search-box">
+                <div class="search-input-group">
+                    <input type="text" id="searchInput" placeholder="Caută cuvinte cheie sau fraze..."
+                        autocomplete="off">
+                </div>
+                <div class="controls">
+                    <label>Rezultate:</label>
+                    <select id="limitSelect">
+                        <option value="5">5</option>
+                        <option value="10" selected>10</option>
+                        <option value="20">20</option>
+                    </select>
+                    <button class="primary-btn" id="searchButton" onclick="performSearch()">🔍 Caută</button>
+                </div>
+            </div>
+            <div id="searchStatus" class="status"></div>
+            <div id="searchResults"></div>
+        </div>
+
+        <!-- Chat Tab Content -->
+        <div id="chat-tab" class="tab-content">
+            <div class="chat-container">
+                <div class="chat-history" id="chatHistory">
+                    <div class="message ai">
+                        Bună! Sunt asistentul tău AI. Întreabă-mă orice despre documentele tale! 🤖
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chatInput" placeholder="Scrie o întrebare..." autocomplete="off">
+                    <button class="primary-btn" id="sendButton" onclick="sendMessage()">Trimite 🚀</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+
+        // Tab Switching Logic
+        function switchTab(tabName) {
+            // Update buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update content
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        }
+
+        // --- SEARCH FUNCTIONALITY ---
+        async function performSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            const limit = document.getElementById('limitSelect').value;
+            const statusDiv = document.getElementById('searchStatus');
+            const resultsDiv = document.getElementById('searchResults');
+            const btn = document.getElementById('searchButton');
+
+            if (!query) return;
+
+            btn.disabled = true;
+            statusDiv.className = 'status loading';
+            statusDiv.textContent = 'Se caută...';
+            resultsDiv.innerHTML = '';
+
+            try {
+                const response = await fetch(`${API_URL}/search`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query, limit: parseInt(limit) })
+                });
+
+                const results = await response.json();
+
+                if (results.length === 0) {
+                    statusDiv.className = 'status error';
+                    statusDiv.textContent = 'Niciun rezultat găsit.';
+                } else {
+                    statusDiv.className = 'status success';
+                    statusDiv.textContent = `${results.length} rezultate găsite.`;
+
+                    resultsDiv.innerHTML = results.map((r, i) => `
+                        <div class="result-card">
+                            <div class="result-header">
+                                <span style="font-weight:bold; color:#667eea">#${i + 1}</span>
+                                <span class="result-score">Scor: ${r.score.toFixed(3)}</span>
+                            </div>
+                            <div class="result-meta">
+                                📄 ${r.source.split('\\').pop()} • Pagina ${r.page}
+                            </div>
+                            <div style="line-height:1.6">${r.text}</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = 'Eroare conexiune API: ' + e.message;
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        // --- CHAT FUNCTIONALITY ---
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const history = document.getElementById('chatHistory');
+            const btn = document.getElementById('sendButton');
+            const query = input.value.trim();
+
+            if (!query) return;
+
+            // Add User Message
+            appendMessage('user', query);
+            input.value = '';
+            btn.disabled = true;
+
+            // Add Loading Message
+            const loadingId = 'loading-' + Date.now();
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'message ai';
+            loadingDiv.id = loadingId;
+            loadingDiv.innerHTML = 'Gândesc<span class="loading-dots"></span>';
+            history.appendChild(loadingDiv);
+            history.scrollTop = history.scrollHeight;
+
+            try {
+                const response = await fetch(`${API_URL}/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query, limit: 5 })
+                });
+
+                const data = await response.json();
+
+                // Remove loading
+                document.getElementById(loadingId).remove();
+
+                // Add AI Response
+                let content = data.answer;
+
+                // Add sources if available
+                if (data.context_used && data.context_used.length > 0) {
+                    const uniqueSources = [...new Set(data.context_used.map(s => s.source.split('\\').pop()))];
+                    content += `<div class="sources-list">📚 Surse: ${uniqueSources.map(s => `<span class="source-tag">${s}</span>`).join('')}</div>`;
+                }
+
+                appendMessage('ai', content);
+
+            } catch (e) {
+                document.getElementById(loadingId).remove();
+                appendMessage('ai', '❌ Eroare: Nu pot contacta serverul. Verifică dacă API-ul rulează.');
+            } finally {
+                btn.disabled = false;
+                input.focus();
+            }
+        }
+
+        function appendMessage(role, htmlContent) {
+            const history = document.getElementById('chatHistory');
+            const div = document.createElement('div');
+            div.className = `message ${role}`;
+            div.innerHTML = htmlContent;
+            history.appendChild(div);
+            history.scrollTop = history.scrollHeight;
+        }
+
+        // Event Listeners for Enter Key
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') performSearch();
+        });
+        document.getElementById('chatInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+    </script>
+</body>
+
+</html>

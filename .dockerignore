@@ -1,0 +1,35 @@
+# Fișiere Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# Qdrant database (va fi în volume Docker)
+qdrant_db/
+
+# Fișiere temporare
+*.txt
+*.pdf
+*.log
+logs/
+
+# Tracking file (va fi în volume Docker)
+fisiere_indexate.json
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Model cache (se descarcă automat)
+.cache/
+models/

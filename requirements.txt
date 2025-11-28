@@ -1,0 +1,44 @@
+# ============================================================================
+# Core Dependencies - Căutare & Indexare
+# ============================================================================
+pymupdf                          # Procesare PDF
+sentence-transformers            # Generare embeddings semantice
+qdrant-client                    # Vector database client
+torch                            # PyTorch pentru ML models
+
+# ============================================================================
+# API & Web
+# ============================================================================
+fastapi                          # REST API framework
+uvicorn[standard]                # ASGI server
+pydantic                         # Validare date
+
+# ============================================================================
+# Document Processing
+# ============================================================================
+python-docx                      # Procesare fișiere DOCX (Word)
+openpyxl                         # Procesare fișiere Excel (.xlsx)
+
+# ============================================================================
+# Video & Audio Processing
+# ============================================================================
+faster-whisper                   # Transcriere audio/video (optimizat GPU)
+moviepy                          # Procesare video (extragere audio)
+imageio-ffmpeg                   # FFmpeg wrapper pentru moviepy
+
+# ============================================================================
+# CUDA Support (pentru GPU acceleration)
+# ============================================================================
+nvidia-cublas-cu12               # CUDA BLAS library
+nvidia-cudnn-cu12                # CUDA Deep Neural Network library
+
+# ============================================================================
+# GUI & Scheduling
+# ============================================================================
+PyQt6                            # Desktop GUI application
+schedule                         # Task scheduling
+
+# ============================================================================
+# AI & Chat (RAG)
+# ============================================================================
+openai                           # OpenAI API client (pentru Ollama compatibility)

@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  # Serviciu de indexare automată
+  indexare:
+    build: .
+    container_name: pdf-indexare
+    volumes:
+      # Montăm folderul cu PDF-uri (schimbă calea cu a ta)
+      - //192.168.27.44/it/copy cosmin creta/Documentatie/Documentatie lucru:/app/pdf_source:ro
+      # Baza de date Qdrant (persistentă)
+      - ./qdrant_db:/app/qdrant_db
+      # Fișierul de tracking
+      - ./fisiere_indexate.json:/app/fisiere_indexate.json
+      # Loguri
+      - ./logs:/app/logs
+    environment:
+      - FOLDER_PDF=/app/pdf_source
+    restart: unless-stopped
+    networks:
+      - rag-network
+
+  # Serviciu de căutare (API)
+  api:
+    build: .
+    container_name: pdf-api
+    command: python api_cautare.py
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./qdrant_db:/app/qdrant_db:ro
+    restart: unless-stopped
+    networks:
+      - rag-network
+    depends_on:
+      - indexare
+
+networks:
+  rag-network:
+    driver: bridge
