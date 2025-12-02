@@ -103,11 +103,13 @@ def iterare_chunkuri_docx(cale_docx):
 def iterare_chunkuri_video(cale_video):
     """Generator: procesează VIDEO folosind Whisper și yield-ează chunk-uri.
     """
+    chunk_count = 0
     try:
         # Folosim generatorul din video_extractie care returnează (timestamp, text_segment)
         for timestamp, text_segment in extrage_text_video(cale_video):
             # Împărțim textul segmentului în chunk-uri
             for bucata in imparte_text_in_chunkuri(text_segment):
+                chunk_count += 1
                 yield {
                     'text_chunk': bucata,
                     'metadata': {
@@ -116,9 +118,11 @@ def iterare_chunkuri_video(cale_video):
                         'tip_document': 'VIDEO'
                     }
                 }
+        print(f"   -> Procesare video completă: {chunk_count} chunk-uri generate")
     except Exception as e:
         print(f"Eroare la procesarea VIDEO {cale_video}: {e}")
-        return
+        # Re-raise pentru a notifica indexarea că procesarea a eșuat
+        raise
 
 
 def iterare_chunkuri_excel(cale_excel):

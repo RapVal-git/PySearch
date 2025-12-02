@@ -164,9 +164,12 @@ def indexare_incrementala(cale_folder):
             # Salveaza progresul
             with open(fisier_tracking, "w", encoding="utf-8") as f:
                 json.dump(fisiere_indexate, f, ensure_ascii=False, indent=2)
+            
+            print(f"\n   Fișier indexat cu succes! Hash salvat: {hash_curent[:8]}...")
                     
         except Exception as e:
-            print(f"\nEroare la procesarea fisierului {cale_document}: {e}")
+            print(f"\n Eroare la procesarea fisierului {cale_document}: {e}")
+            print(f"   Hash-ul NU a fost salvat - fișierul va fi re-procesat la următoarea indexare.")
 
     # Upload remaining points
     if points:
