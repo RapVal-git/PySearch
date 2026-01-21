@@ -8,6 +8,11 @@ from qdrant_client import QdrantClient
 from qdrant_client.http import models
 from procesare_text import iterare_chunkuri_document
 import config
+import gc
+try:
+    import torch
+except ImportError:
+    torch = None
 
 def calculeaza_hash_fisier(cale_fisier):
     """Calculeaza hash-ul unui fisier pentru a detecta modificari"""
@@ -158,18 +163,26 @@ def indexare_incrementala(cale_folder):
                     points = []
             
             # Marcheaza fisierul ca indexat
+            print(f"   -> Calculare hash final pentru {os.path.basename(cale_document)}...")
             hash_curent = calculeaza_hash_fisier(cale_document)
             fisiere_indexate[cale_document] = hash_curent
             
             # Salveaza progresul
+            print(f"   -> Salvare progres în {fisier_tracking}...")
             with open(fisier_tracking, "w", encoding="utf-8") as f:
                 json.dump(fisiere_indexate, f, ensure_ascii=False, indent=2)
             
-            print(f"\n   Fișier indexat cu succes! Hash salvat: {hash_curent[:8]}...")
+            print(f"   -> Fișier indexat cu succes! Hash salvat: {hash_curent[:8]}...")
                     
         except Exception as e:
             print(f"\n Eroare la procesarea fisierului {cale_document}: {e}")
             print(f"   Hash-ul NU a fost salvat - fișierul va fi re-procesat la următoarea indexare.")
+        
+        # Memory Cleanup după fiecare fișier (critic pentru Video/Whisper)
+        print("   -> Curățare memorie...")
+        gc.collect()
+        if torch and torch.cuda.is_available():
+            torch.cuda.empty_cache()
 
     # Upload remaining points
     if points:

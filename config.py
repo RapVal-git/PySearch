@@ -67,7 +67,7 @@ EMBEDDING_MODEL = os.getenv(
 
 # Dimensiunea modelului Whisper
 # Opțiuni: 'tiny', 'base', 'small', 'medium', 'large', 'large-v2', 'large-v3'
-WHISPER_MODEL_SIZE = os.getenv("WHISPER_MODEL_SIZE", "large")
+WHISPER_MODEL_SIZE = os.getenv("WHISPER_MODEL_SIZE", "tiny")
 
 # Durata unui bloc de text din video (secunde)
 # Chunk-urile mai mari = mai puțini vectori, dar context mai mare
