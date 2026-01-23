@@ -20,20 +20,23 @@ Asigură-te că ai instalate:
 
 ##  2. Pasul 1: Indexarea Documentelor
 
-Înainte să cauți, trebuie să "citești" documentele în baza de date.
+Inainte sa cauti, trebuie sa indexezi documentele folosind lista din `config.py`.
 
-1.  Pune fișierele tale (PDF, Excel, Word, Video) într-un folder (ex: `C:\Documente`).
-2.  Rulează scriptul de indexare:
+1. Configureaza folderele in `config.py`:
+    ```bash
+    INDEXING_FOLDERS = [
+        r"\\192.168.27.44\ERP-implementare",
+        r"\\192.168.27.44\it\AI",
+    ]
+    ```
+2. Ruleaza indexarea incrementala:
     ```bash
     python indexare_incrementala.py
     ```
-3.  Când te întreabă, introdu calea folderului:
-    ```text
-    Introdu calea folderului: C:\Documente
-    ```
-4.  Așteaptă să termine. Vei vedea mesaje de genul `[NOU] Procesat: fisier.pdf`.
+3. Asteapta sa termine. Vei vedea mesaje de genul `[NOU] Procesat: fisier.pdf`.
 
 ---
+
 
 ##  3. Pasul 2: Pornirea AI-ului (Ollama)
 
@@ -56,7 +59,7 @@ Acesta este "creierul" care face legătura între interfață și baza de date.
 1.  Deschide un terminal nou în folderul proiectului.
 2.  Rulează:
     ```bash
-    python api_cautare.py
+    python api_cautare_secured.py
     ```
 3.  Dacă vezi mesajul `Uvicorn running on http://0.0.0.0:8000`, ești gata!
 
@@ -87,7 +90,7 @@ Ai două opțiuni, alege-o pe cea care îți place:
 | :--- | :--- |
 | **1. Indexare** | `python indexare_incrementala.py` |
 | **2. Start AI** | `ollama run llama3` |
-| **3. Start API** | `python api_cautare.py` |
+| **3. Start API** | `python api_cautare_secured.py` |
 | **4. Start App** | `python gui_cautare.py` (sau deschide HTML) |
 
 ---
@@ -98,7 +101,7 @@ Ai două opțiuni, alege-o pe cea care îți place:
 A: Nu! Doar când adaugi fișiere noi. Rulezi `indexare_incrementala.py` și el va procesa **doar** ce e nou.
 
 **Q: Chat-ul îmi dă eroare.**
-A: Verifică dacă ai pornit Ollama (`ollama run llama3`) și dacă API-ul rulează (`python api_cautare.py`).
+A: Verifică dacă ai pornit Ollama (`ollama run llama3`) și dacă API-ul rulează (`python api_cautare_secured.py`).
 
 **Q: Pot accesa de pe alt calculator?**
 A: Da! Dacă API-ul rulează pe server, modifică în `web_cautare.html` linia `const API_URL = 'http://localhost:8000';` cu IP-ul serverului (ex: `http://192.168.1.50:8000`).

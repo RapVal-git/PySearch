@@ -203,14 +203,21 @@ def indexare_incrementala(cale_folder):
     print(f"Total vectori noi indexati: {total_vectors}")
 
 if __name__ == "__main__":
-    # Folosește folder-ul din config.py (poate fi suprascris cu variabilă de mediu)
-    folder_tinta = config.DEFAULT_INDEXING_FOLDER
-    
-    print(f"Folder tinta: {folder_tinta}")
-    
-    # Permite override manual
-    user_input = input("Apasati Enter pentru a continua sau introduceti alta cale: ").strip()
-    if user_input:
-        folder_tinta = user_input
+    folders = []
 
-    indexare_incrementala(folder_tinta)
+    # Override explicit prin variabila de mediu INDEXING_FOLDER
+    if config.DEFAULT_INDEXING_FOLDER:
+        folders = [config.DEFAULT_INDEXING_FOLDER]
+    else:
+        folders = [f for f in getattr(config, "INDEXING_FOLDERS", []) if f]
+
+    if not folders:
+        user_input = input("Introduceti calea folderului de indexat: ").strip()
+        if not user_input:
+            print("Eroare: nu a fost furnizat un folder pentru indexare.")
+            raise SystemExit(1)
+        folders = [user_input]
+
+    for folder_tinta in folders:
+        print(f"Folder tinta: {folder_tinta}")
+        indexare_incrementala(folder_tinta)

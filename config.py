@@ -23,11 +23,14 @@ BASE_DIR = Path(__file__).parent.absolute()
 # Calea către baza de date Qdrant (poate fi suprascrisă cu variabilă de mediu)
 QDRANT_PATH = os.getenv("QDRANT_PATH", str(BASE_DIR / "qdrant_db"))
 
-# Folder implicit pentru indexare (poate fi suprascris)
-DEFAULT_INDEXING_FOLDER = os.getenv(
-    "INDEXING_FOLDER", 
-    r"C:\Users\IT\Desktop\Folder test"
-)
+# Foldere implicite pentru indexare (lista)
+INDEXING_FOLDERS = [
+    r"\\192.168.27.44\ERP-implementare",
+    r"\\192.168.27.44\it\AI",
+]
+
+# Override optional pentru un singur folder (gol implicit)
+DEFAULT_INDEXING_FOLDER = os.getenv("INDEXING_FOLDER", "")
 
 # Fișier pentru tracking documente indexate
 INDEXED_FILES_JSON = str(BASE_DIR / "fisiere_indexate.json")

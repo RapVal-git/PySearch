@@ -3,8 +3,12 @@ import os
 import schedule
 from indexare_incrementala import indexare_incrementala
 import config
-# Citește calea din variabilă de mediu
-FOLDER_PDF = config.DEFAULT_INDEXING_FOLDER
+
+# Foldere de indexare (prioritate: override din env, apoi lista din config)
+if config.DEFAULT_INDEXING_FOLDER:
+    FOLDERS = [config.DEFAULT_INDEXING_FOLDER]
+else:
+    FOLDERS = [f for f in getattr(config, "INDEXING_FOLDERS", []) if f]
 
 def job():
     """Functie care ruleaza indexarea incrementala"""
@@ -13,7 +17,9 @@ def job():
     print("="*60)
     
     try:
-        indexare_incrementala(FOLDER_PDF)
+        for folder in FOLDERS:
+            print(f"Folder tinta: {folder}")
+            indexare_incrementala(folder)
     except Exception as e:
         print(f"EROARE la indexare: {e}")
     
@@ -22,8 +28,12 @@ def job():
     print("="*60 + "\n")
 
 if __name__ == "__main__":
+    if not FOLDERS:
+        print("Eroare: nu exista foldere configurate pentru indexare.")
+        raise SystemExit(1)
+
     print("Serviciu de indexare automata pornit!")
-    print(f"Folder monitorizat: {FOLDER_PDF}")
+    print(f"Foldere monitorizate: {', '.join(FOLDERS)}")
     print("Verifica folderul la fiecare 1 ora pentru fisiere noi...")
     print("Apasa Ctrl+C pentru a opri.\n")
     

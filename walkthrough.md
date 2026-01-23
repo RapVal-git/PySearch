@@ -2,62 +2,34 @@
 
 Ghid complet pentru utilizarea sistemului de căutare în PDF-uri.
 
-## 📚 Scripturi Disponibile
+## Scripturi Disponibile
 
-### 1. `indexare_folder_qdrant.py` - Indexare Completă
-**Când să-l folosești:**
-- Prima indexare a unui folder
-- După ce ștergi baza de date (`qdrant_db/`)
-- Când vrei să re-indexezi totul de la zero
-
-**Cum funcționează:**
-- Scanează tot folderul recursiv
-- Indexează TOATE PDF-urile găsite
-- Nu verifică dacă sunt deja indexate
-
-**Rulare:**
-```bash
-python indexare_folder_qdrant.py
-```
-
----
-
-### 2. `indexare_incrementala.py` ⭐ **RECOMANDAT**
-**Când să-l folosești:**
-- După prima indexare
-- Când adaugi PDF-uri noi în folder
-- Când modifici PDF-uri existente
+### 1. `indexare_incrementala.py` ? **RECOMANDAT**
+**Cand sa-l folosesti:**
+- Indexare initiala (prima rulare)
+- Cand adaugi fisiere noi in folderele configurate
 - Pentru update-uri regulate
 
-**Cum funcționează:**
-- Calculează hash-ul fiecărui PDF
-- Salvează lista în `fisiere_indexate.json`
-- Indexează doar fișiere noi sau modificate
-- **Mult mai rapid** decât indexarea completă
+**Cum functioneaza:**
+- Calculeaza hash-ul fiecarui fisier
+- Salveaza lista in `fisiere_indexate.json`
+- Indexeaza doar fisiere noi sau modificate
 
 **Rulare:**
 ```bash
 python indexare_incrementala.py
 ```
 
-**Avantaje:**
-- ✅ Detectează automat fișiere noi
-- ✅ Detectează fișiere modificate
-- ✅ Salvează progresul după fiecare fișier
-- ✅ Nu re-procesează ce e deja indexat
-
 ---
 
-### 3. `serviciu_indexare.py` - Indexare Automată
-**Când să-l folosești:**
-- Pe server în producție
-- Când vrei indexare automată continuă
-- În Docker deployment
+### 2. `serviciu_indexare.py` - Indexare Automata
+**Cand sa-l folosesti:**
+- Pe server in productie
+- Cand vrei indexare automata continua
 
-**Cum funcționează:**
-- Rulează `indexare_incrementala.py` automat
-- Verifică la fiecare **1 oră** (configurabil)
-- Rulează continuu în background
+**Cum functioneaza:**
+- Ruleaza `indexare_incrementala.py` automat
+- Verifica la fiecare **1 ora** (configurabil)
 
 **Rulare:**
 ```bash
@@ -66,57 +38,46 @@ python serviciu_indexare.py
 
 **Configurare interval:**
 ```python
-# În serviciu_indexare.py, schimbă:
-schedule.every(1).hours.do(job)      # La fiecare oră
+# In serviciu_indexare.py, schimba:
+schedule.every(1).hours.do(job)      # La fiecare ora
 schedule.every(30).minutes.do(job)   # La fiecare 30 min
 schedule.every().day.at("02:00").do(job)  # Zilnic la 2 AM
 ```
 
 ---
 
-### 4. `cautare_qdrant.py` - Căutare Interactivă
-**Când să-l folosești:**
-- Pentru căutări manuale în terminal
-- Testing și debugging
+### 3. `api_cautare_secured.py` - REST API (Securizat)
+**Cand sa-l folosesti:**
+- In productie pe server
+- Cand vrei sa integrezi cu alte aplicatii
+- Pentru acces remote la cautare
 
 **Rulare:**
 ```bash
-python cautare_qdrant.py
-```
-
-**Configurare număr rezultate:**
-```python
-# În cautare_qdrant.py, linia 46:
-limit=10  # Schimbă cu câte rezultate vrei
-```
-
----
-
-### 5. `api_cautare.py` - REST API
-**Când să-l folosești:**
-- În producție pe server
-- Când vrei să integrezi cu alte aplicații
-- Pentru acces remote la căutare
-
-**Rulare:**
-```bash
-python api_cautare.py
+python api_cautare_secured.py
 ```
 
 **Acces:**
 - API: `http://localhost:8000`
-- Documentație: `http://localhost:8000/docs`
+- Documentatie: `http://localhost:8000/docs`
 
 **Exemplu request:**
 ```bash
-curl -X POST http://localhost:8000/search \
-  -H "Content-Type: application/json" \
-  -d '{"query": "ion exchange", "limit": 5}'
+curl -X POST http://localhost:8000/search   -H "Content-Type: application/json"   -d '{"query": "ion exchange", "limit": 5}'
 ```
 
 ---
 
-## 🚀 Workflow Recomandat
+### 4. Web Search (HTML)
+**Cand sa-l folosesti:**
+- Pentru interfata web cu login si cautare
+
+**Rulare:**
+- Deschide `web_cautare.html` in browser
+
+---
+
+## Workflow Recomandat
 
 ### Setup Inițial (Prima dată)
 ```bash
@@ -124,7 +85,7 @@ curl -X POST http://localhost:8000/search \
 pip install -r requirements.txt
 
 # 2. Indexare completă (prima dată)
-python indexare_folder_qdrant.py
+python indexare_incrementala.py
 ```
 
 ### Utilizare Zilnică (Local)
@@ -133,7 +94,7 @@ python indexare_folder_qdrant.py
 python indexare_incrementala.py
 
 # Căutare
-python cautare_qdrant.py
+foloseste API-ul securizat sau web_cautare.html
 ```
 
 ### Deployment Server (Docker)
@@ -210,7 +171,7 @@ rm -rf qdrant_db/
 rm fisiere_indexate.json
 
 # Re-indexează
-python indexare_folder_qdrant.py
+python indexare_incrementala.py
 ```
 
 ---
@@ -228,7 +189,7 @@ python indexare_folder_qdrant.py
 ## 🎯 Next Steps
 
 1. **Testează local** cu `indexare_incrementala.py`
-2. **Verifică căutarea** cu `cautare_qdrant.py`
+2. **Verifică căutarea** cu API securizat / web
 3. **Deploy pe server** cu Docker
 4. **Monitorizează** și ajustează intervalul de indexare
 

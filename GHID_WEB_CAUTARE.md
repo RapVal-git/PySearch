@@ -17,14 +17,15 @@ python import_sap_users.py
 ```
 Fisierul asteptat este `sap_export.csv` in acelasi folder.
 
-3) Indexeaza documentele publice (doar incremental):
+3) Configura folderele de indexare in `config.py`:
 ```
-set INDEXING_FOLDER=\\192.168.27.44\ERP-implementare
-python indexare_incrementala.py
+INDEXING_FOLDERS = [
+    r"\\192.168.27.44\ERP-implementare",
+    r"\\192.168.27.44\it\AI",
+]
 ```
-Optional: indexeaza si folderul IT (acces doar grupului "it"), tot incremental:
+Apoi ruleaza indexarea incrementala:
 ```
-set INDEXING_FOLDER=\\192.168.27.44\it\AI
 python indexare_incrementala.py
 ```
 
