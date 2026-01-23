@@ -1,5 +1,9 @@
 import os
 import sys
+# Force UTF-8 output for Windows console
+if sys.platform == "win32":
+    sys.stdout.reconfigure(encoding='utf-8')
+
 from video_extractie import extrage_text_video
 
 def main():
@@ -8,7 +12,13 @@ def main():
     print("="*60)
     
     # 1. Obține calea fișierului
-    if len(sys.argv) > 1:
+    # Setează această variabilă pentru a evita introducerea manuală a căii
+    HARDCODED_PATH = r""  # Ex: r"\\server\share\video.mp4"
+
+    if HARDCODED_PATH:
+        cale_video = HARDCODED_PATH
+        print(f"⚠️  Se folosește calea hardcodată: {cale_video}")
+    elif len(sys.argv) > 1:
         cale_video = sys.argv[1]
     else:
         cale_video = input("\nIntrodu calea completă către fișierul video: ").strip()

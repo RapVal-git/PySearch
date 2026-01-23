@@ -5,6 +5,11 @@ import json
 import os
 import time
 import uuid
+try:
+    from auth_config import get_groups_for_folder
+except Exception:
+    def get_groups_for_folder(_path):
+        return []
 
 def genereaza_vectori_qdrant():
     # Configuration
@@ -64,6 +69,10 @@ def genereaza_vectori_qdrant():
         # Prepare Payload (Metadata)
         payload = doc.get('metadata', {})
         payload['text_chunk'] = text # Store text in payload for retrieval
+        file_path = payload.get('sursa_fisier', '')
+        allowed_groups = get_groups_for_folder(file_path)
+        if allowed_groups:
+            payload['allowed_groups'] = allowed_groups
 
         # Create Point
         point_id = str(uuid.uuid4()) # Generate unique ID

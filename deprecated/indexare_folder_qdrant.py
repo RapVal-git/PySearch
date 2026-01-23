@@ -6,6 +6,11 @@ from qdrant_client import QdrantClient
 from qdrant_client.http import models
 from procesare_text import iterare_chunkuri_document
 import config
+try:
+    from auth_config import get_groups_for_folder
+except Exception:
+    def get_groups_for_folder(_path):
+        return []
 
 def indexare_folder_qdrant(cale_folder):
     # Configuration (din config.py)
@@ -97,6 +102,10 @@ def indexare_folder_qdrant(cale_folder):
                 # Prepare Payload
                 payload = item.get('metadata', {})
                 payload['text_chunk'] = text
+                file_path = payload.get('sursa_fisier', cale_document)
+                allowed_groups = get_groups_for_folder(file_path)
+                if allowed_groups:
+                    payload['allowed_groups'] = allowed_groups
                 
                 # Create Point
                 point_id = str(uuid.uuid4())

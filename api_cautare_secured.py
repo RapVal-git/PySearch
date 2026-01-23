@@ -12,12 +12,14 @@ import config
 
 # Import configurare autentificare
 from auth_config import (
-    verify_password, 
-    get_user_role, 
+    verify_password,
+    get_user_role,
     filter_results_by_user,
     get_allowed_folders,
-    get_allowed_folders,
-    USERS
+    get_user_groups,
+    user_must_set_password,
+    set_user_password,
+    USERS,
 )
 
 # Import RAG Engine
@@ -72,6 +74,12 @@ class LoginResponse(BaseModel):
     token_type: str
     username: str
     role: str
+
+class SetPasswordRequest(BaseModel):
+    username: str
+    new_password: str
+    current_password: Optional[str] = None
+
 
 
 class ChatRequest(BaseModel):
@@ -164,10 +172,22 @@ async def login(request: LoginRequest):
         "password": "admin123"
     }
     """
+    if request.username not in USERS:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Username sau parola incorecta"
+        )
+
+    if user_must_set_password(request.username):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Parola nu este setata. Foloseste /set-password."
+        )
+
     if not verify_password(request.username, request.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Username sau parolÄƒ incorectÄƒ"
+            detail="Username sau parola incorecta"
         )
     
     # GenereazÄƒ API key
@@ -189,13 +209,48 @@ async def get_current_user(username: str = Depends(verify_bearer_token)):
     """ReturneazÄƒ informaÈ›ii despre utilizatorul curent"""
     role = get_user_role(username)
     allowed_folders = get_allowed_folders(username)
+    groups = get_user_groups(username)
     
     return {
         "username": username,
         "role": role,
         "name": USERS[username]["name"],
-        "allowed_folders": allowed_folders
+        "allowed_folders": allowed_folders,
+        "groups": groups
     }
+
+
+@app.post("/set-password")
+async def set_password(request: SetPasswordRequest):
+    """
+    Setare parola pentru utilizator.
+    - Daca userul nu are parola setata (first login), nu cere current_password.
+    - Daca parola exista, current_password este obligatorie.
+    """
+    if request.username not in USERS:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Utilizator inexistent"
+        )
+
+    if user_must_set_password(request.username):
+        set_user_password(request.username, request.new_password)
+        return {"status": "ok", "message": "Parola setata cu succes."}
+
+    if not request.current_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="current_password este obligatoriu"
+        )
+
+    if not verify_password(request.username, request.current_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Parola curenta este incorecta"
+        )
+
+    set_user_password(request.username, request.new_password)
+    return {"status": "ok", "message": "Parola schimbata cu succes."}
 
 
 @app.post("/search", response_model=list[SearchResult])

@@ -13,6 +13,11 @@ try:
     import torch
 except ImportError:
     torch = None
+try:
+    from auth_config import get_groups_for_folder
+except Exception:
+    def get_groups_for_folder(_path):
+        return []
 
 def calculeaza_hash_fisier(cale_fisier):
     """Calculeaza hash-ul unui fisier pentru a detecta modificari"""
@@ -152,6 +157,10 @@ def indexare_incrementala(cale_folder):
                 
                 payload = item.get('metadata', {})
                 payload['text_chunk'] = text
+                file_path = payload.get('sursa_fisier', cale_document)
+                allowed_groups = get_groups_for_folder(file_path)
+                if allowed_groups:
+                    payload['allowed_groups'] = allowed_groups
                 
                 point_id = str(uuid.uuid4())
                 points.append(models.PointStruct(id=point_id, vector=vector, payload=payload))
