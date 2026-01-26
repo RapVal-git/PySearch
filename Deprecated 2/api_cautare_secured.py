@@ -357,23 +357,7 @@ async def stats(username: str = Depends(verify_bearer_token)):
 
 
 if __name__ == "__main__":
-    print("""
-â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
-â•‘                                                                â•‘
-â•‘           PDF SEARCH API - SECURED VERSION                    â•‘
-â•‘                                                                â•‘
-â•‘  Autentificare activatÄƒ!                                      â•‘
-â•‘                                                                â•‘
-â•‘  Utilizatori demo:                                            â•‘
-â•‘    - admin / admin123     (acces complet)                     â•‘
-â•‘    - manager / manager123 (acces limitat)                     â•‘
-â•‘    - hr / hr123           (doar HR)                           â•‘
-â•‘    - finance / finance123 (doar Financiar)                    â•‘
-â•‘    - user1 / user123      (doar Public)                       â•‘
-â•‘                                                                â•‘
-â•‘  Workflow:                                                     â•‘
-â•‘    1. POST /login cu username + password                      â•‘
-```python
+    
 from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
