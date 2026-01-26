@@ -4,6 +4,62 @@ Acest ghid îți explică pas cu pas cum să pornești întregul sistem, de la z
 
 ---
 
+##  Productie (Docker, Qdrant SERVER)
+
+Aceasta varianta ruleaza totul in containere si foloseste Qdrant SERVER.
+
+###  Pasul 1: Cerinte
+1. **Docker Desktop** instalat si pornit.
+
+###  Pasul 2: Configurare
+1. Copiaza `.env.example` in `.env` (optional) si seteaza valorile tale.
+2. In `docker-compose.production.yml`, actualizeaza volumul cu documente:
+   - `//192.168.27.44/...:/app/pdf_source:ro`
+3. Pentru Chat, foloseste serviciul **ollama** din compose (recomandat).
+   - Nu mai ai nevoie de `OLLAMA_BASE_URL` spre host, foloseste `http://ollama:11434/v1`
+
+###  Pasul 3: Pornire productie
+```bash
+docker compose -f docker-compose.production.yml up -d --build
+```
+
+###  Pasul 4: Pregatire Ollama (prima data)
+Trage modelul in container:
+```bash
+docker exec -it ollama ollama pull llama3
+```
+Test rapid:
+```bash
+curl http://localhost:11434/api/tags
+```
+
+###  Ce porneste
+- **qdrant**: baza de date vectoriala (server) pe volum `./qdrant_storage`
+- **ollama**: server LLM pe portul 11434 (modelul se salveaza in `./ollama`)
+- **indexare**: ruleaza la pornire si apoi la fiecare 1 ora (serviciu de indexare)
+- **api-1 / api-2**: API FastAPI
+- **nginx**: proxy + UI web (serveste `web_cautare.html` pe portul 80)
+- **redis / prometheus / grafana**: optionale (poti elimina daca nu le folosesti)
+
+###  Acces
+- UI web: `http://localhost`
+- API (prin nginx): `http://localhost` (conform `nginx/nginx.conf`)
+
+###  Testare rapida (API)
+1. Verifica health:
+```bash
+curl http://localhost/health
+```
+2. Test chat (dupa ce ai indexat):
+```bash
+curl -X POST http://localhost/chat -H "Content-Type: application/json" -d "{\"query\":\"Test\",\"limit\":1}"
+```
+
+###  Reindexare
+La trecerea pe Qdrant server trebuie sa refaci indexarea (datele nu mai sunt in `qdrant_db` local).
+
+---
+
 ##  1. Cerințe Preliminare
 
 Asigură-te că ai instalate:

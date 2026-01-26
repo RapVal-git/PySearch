@@ -4,7 +4,6 @@ import uuid
 import hashlib
 import json
 from sentence_transformers import SentenceTransformer
-from qdrant_client import QdrantClient
 from qdrant_client.http import models
 from procesare_text import iterare_chunkuri_document
 import config
@@ -25,7 +24,6 @@ def calculeaza_hash_fisier(cale_fisier):
 def indexare_incrementala(cale_folder):
     # Configuration (din config.py)
     collection_name = config.COLLECTION_NAME
-    qdrant_path = config.QDRANT_PATH
     batch_size = config.BATCH_SIZE
     fisier_tracking = config.INDEXED_FILES_JSON
 
@@ -41,8 +39,11 @@ def indexare_incrementala(cale_folder):
     
     # Initialize Qdrant Client
     try:
-        client = QdrantClient(path=qdrant_path, timeout=config.QDRANT_TIMEOUT)
-        print(f"Conectat la Qdrant Local: {os.path.abspath(qdrant_path)}")
+        client = config.get_qdrant_client()
+        if config.QDRANT_URL:
+            print(f"Conectat la Qdrant Server: {config.QDRANT_URL}")
+        else:
+            print(f"Conectat la Qdrant Local: {os.path.abspath(config.QDRANT_PATH)}")
     except Exception as e:
         print(f"Eroare la initializarea Qdrant Local: {e}")
         return

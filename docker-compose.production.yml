@@ -22,6 +22,18 @@ services:
       retries: 3
 
   # Serviciu de indexare automată
+  # Ollama (LLM server)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./ollama:/root/.ollama
+    restart: unless-stopped
+    networks:
+      - rag-network
+
   indexare:
     build: .
     container_name: pdf-indexare
@@ -34,7 +46,7 @@ services:
       # Loguri
       - ./logs:/app/logs
     environment:
-      - FOLDER_PDF=/app/pdf_source
+      - INDEXING_FOLDER=/app/pdf_source
       - QDRANT_URL=http://qdrant:6333
     restart: unless-stopped
     networks:
@@ -57,10 +69,10 @@ services:
     container_name: pdf-api-1
     command: gunicorn api_cautare:app -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000
     volumes:
-      - ./qdrant_storage:/app/qdrant_db:ro
       - ./logs:/app/logs
     environment:
       - QDRANT_URL=http://qdrant:6333
+      - OLLAMA_BASE_URL=http://ollama:11434/v1
       - WORKERS=4
     restart: unless-stopped
     networks:
@@ -87,10 +99,10 @@ services:
     container_name: pdf-api-2
     command: gunicorn api_cautare:app -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000
     volumes:
-      - ./qdrant_storage:/app/qdrant_db:ro
       - ./logs:/app/logs
     environment:
       - QDRANT_URL=http://qdrant:6333
+      - OLLAMA_BASE_URL=http://ollama:11434/v1
       - WORKERS=4
     restart: unless-stopped
     networks:
@@ -188,6 +200,7 @@ networks:
 
 volumes:
   qdrant_storage:
+  ollama:
   redis_data:
   prometheus_data:
   grafana_data:

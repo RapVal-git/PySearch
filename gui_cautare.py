@@ -7,7 +7,7 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
 from PyQt6.QtGui import QFont, QPalette, QColor
 from sentence_transformers import SentenceTransformer
-from qdrant_client import QdrantClient
+import config
 import time
 
 # Import RAG Engine (asigură-te că rag_engine.py există)
@@ -386,7 +386,7 @@ class SearchGUI(QMainWindow):
         
         try:
             # 1. Qdrant
-            self.client = QdrantClient(path="qdrant_db")
+            self.client = config.get_qdrant_client()
             
             # 2. Embedding Model
             self.model = SentenceTransformer('paraphrase-multilingual-mpnet-base-v2')

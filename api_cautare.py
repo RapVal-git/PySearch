@@ -2,7 +2,6 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer
-from qdrant_client import QdrantClient
 import uvicorn
 from typing import List, Optional
 import config
@@ -26,7 +25,6 @@ app.add_middleware(
 
 # Configurare Globală (din config.py)
 collection_name = config.COLLECTION_NAME
-qdrant_path = config.QDRANT_PATH
 model = None
 client = None
 rag_engine = None
@@ -68,7 +66,7 @@ async def startup_event():
     model = SentenceTransformer(config.EMBEDDING_MODEL)
     
     print("2. Conectare la Qdrant...")
-    client = QdrantClient(path=qdrant_path)
+    client = config.get_qdrant_client()
     
     print("3. Inițializare RAG Engine (Local)...")
     try:

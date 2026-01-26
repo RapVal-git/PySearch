@@ -22,11 +22,12 @@ BASE_DIR = Path(__file__).parent.absolute()
 
 # Calea către baza de date Qdrant (poate fi suprascrisă cu variabilă de mediu)
 QDRANT_PATH = os.getenv("QDRANT_PATH", str(BASE_DIR / "qdrant_db"))
+QDRANT_URL = os.getenv("QDRANT_URL", "").strip()
 
 # Folder implicit pentru indexare (poate fi suprascris)
 DEFAULT_INDEXING_FOLDER = os.getenv(
-    "INDEXING_FOLDER", 
-    r"C:\Users\IT\Desktop\Folder test"
+    "INDEXING_FOLDER",
+    os.getenv("FOLDER_PDF", r"C:\Users\IT\Desktop\Folder test")
 )
 
 # Fișier pentru tracking documente indexate
@@ -185,6 +186,15 @@ def get_config_summary():
         "ollama_url": OLLAMA_BASE_URL,
         "log_level": LOG_LEVEL,
     }
+
+
+def get_qdrant_client():
+    """Returneaza clientul Qdrant configurat (server sau local)."""
+    from qdrant_client import QdrantClient
+
+    if QDRANT_URL:
+        return QdrantClient(url=QDRANT_URL, timeout=QDRANT_TIMEOUT)
+    return QdrantClient(path=QDRANT_PATH, timeout=QDRANT_TIMEOUT)
 
 
 def print_config():
