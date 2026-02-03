@@ -4,7 +4,11 @@ from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer
 import uvicorn
 from typing import List, Optional
+from celery.result import AsyncResult
+
 import config
+
+from celery_worker import celery_app, run_indexare_incrementala
 
 # Import RAG Engine (pentru Chat)
 try:
@@ -51,6 +55,9 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     answer: str
     context_used: List[SearchResult]
+
+class IndexingRequest(BaseModel):
+    folder: Optional[str] = None
 
 # ============================================================================
 # INITIALIZARE
@@ -174,6 +181,35 @@ async def chat(request: ChatRequest):
     except Exception as e:
         print(f"Eroare chat: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/index", status_code=202)
+async def trigger_indexing(request: IndexingRequest):
+    """
+    Enqueuează o indexare incrementală folosind Celery.
+    """
+    folder_path = request.folder or config.DEFAULT_INDEXING_FOLDER
+    task = run_indexare_incrementala.apply_async(args=[folder_path])
+    return {
+        "task_id": task.id,
+        "folder": folder_path,
+        "status": "queued"
+    }
+
+@app.get("/tasks/{task_id}")
+async def get_task_status(task_id: str):
+    """
+    Returnează starea unei sarcini Celery de indexare.
+    """
+    result = AsyncResult(task_id, app=celery_app)
+    payload = result.result if result.ready() else None
+    response = {
+        "task_id": task_id,
+        "state": result.state,
+        "folder": payload.get("folder") if isinstance(payload, dict) else None,
+    }
+    if result.state == "FAILURE":
+        response["error"] = str(result.result)
+    return response
 
 @app.get("/health")
 async def health():

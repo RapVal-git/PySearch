@@ -6,52 +6,64 @@ services:
     image: qdrant/qdrant:latest
     container_name: qdrant-server
     ports:
-      - "6333:6333"
-      - "6334:6334"
+      - '6333:6333'
+      - '6334:6334'
     volumes:
       - ./qdrant_storage:/qdrant/storage
     environment:
       - QDRANT__SERVICE__GRPC_PORT=6334
-    depends_on:
-      - qdrant
-    restart: unless-stopped
-    networks:
-      - rag-network
-  # Serviciu de indexare automată
-  indexare:
-    build: .
-    container_name: pdf-indexare
-    command: python serviciu_indexare.py
-    volumes:
-      # Montăm folderul cu PDF-uri (schimbă calea cu a ta)
-      - //192.168.27.44/it/copy cosmin creta/Documentatie/Documentatie lucru:/app/pdf_source:ro
-      # Baza de date Qdrant (persistentă)
-      # Fișierul de tracking
-      - ./fisiere_indexate.json:/app/fisiere_indexate.json
-      # Loguri
-      - ./logs:/app/logs
-    environment:
-      - INDEXING_FOLDER=/app/pdf_source
-      - QDRANT_URL=http://qdrant:6333
     restart: unless-stopped
     networks:
       - rag-network
 
-  # Serviciu de căutare (API)
+  redis:
+    image: redis:7.0-alpine
+    container_name: pysearch-redis
+    ports:
+      - '6379:6379'
+    volumes:
+      - ./redis_data:/data
+    restart: unless-stopped
+    networks:
+      - rag-network
+
+  celery:
+    build: .
+    container_name: pdf-celery
+    command: celery -A celery_worker.celery_app worker --loglevel=info
+    volumes:
+      - //192.168.27.44/it/copy cosmin creta/Documentatie/Documentatie lucru:/app/pdf_source:ro
+      - ./fisiere_indexate.json:/app/fisiere_indexate.json
+      - ./logs:/app/logs
+    environment:
+      - INDEXING_FOLDER=/app/pdf_source
+      - QDRANT_URL=http://qdrant:6333
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+    depends_on:
+      - qdrant
+      - redis
+    restart: unless-stopped
+    networks:
+      - rag-network
+
+  # Serviciu de cautare (API)
   api:
     build: .
     container_name: pdf-api
     command: python api_cautare.py
     ports:
-      - "8000:8000"
+      - '8000:8000'
     environment:
       - QDRANT_URL=http://qdrant:6333
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
     restart: unless-stopped
     networks:
       - rag-network
     depends_on:
       - qdrant
-      - indexare
+      - redis
 
 networks:
   rag-network:
@@ -59,3 +71,4 @@ networks:
 
 volumes:
   qdrant_storage:
+  redis_data:

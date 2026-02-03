@@ -1,16 +1,22 @@
-FROM python:3.10-slim
+FROM nvcr.io/nvidia/pytorch:24.10-py3
 
 # Setează working directory
 WORKDIR /app
-
-# Instalează dependențe sistem
+ENV NVIDIA_VISIBLE_DEVICES=all
+ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
+ENV CELERY_BROKER_URL=redis://redis:6379/0
+ENV CELERY_RESULT_BACKEND=redis://redis:6379/1
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
     ffmpeg \
     libsm6 \
     libxext6 \
+    ca-certificates \
+    openssl \
     && rm -rf /var/lib/apt/lists/*
+
+RUN update-ca-certificates
 
 # Copiază requirements
 COPY requirements.txt .

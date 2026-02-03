@@ -1,4 +1,4 @@
-# Fișiere Python cache
+﻿# FiÈ™iere Python cache
 __pycache__/
 *.py[cod]
 *$py.class
@@ -10,16 +10,18 @@ venv/
 env/
 ENV/
 
-# Qdrant database (va fi în volume Docker)
+# Qdrant database (va fi Ã®n volume Docker)
 qdrant_db/
 
-# Fișiere temporare
+# FiÈ™iere temporare
 *.txt
+!requirements.txt
+!requirements_api.txt
 *.pdf
 *.log
 logs/
 
-# Tracking file (va fi în volume Docker)
+# Tracking file (va fi Ã®n volume Docker)
 fisiere_indexate.json
 
 # IDE
@@ -30,6 +32,7 @@ fisiere_indexate.json
 .DS_Store
 Thumbs.db
 
-# Model cache (se descarcă automat)
+# Model cache (se descarcÄƒ automat)
 .cache/
 models/
+

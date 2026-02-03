@@ -37,6 +37,8 @@ nvidia-cudnn-cu12                # CUDA Deep Neural Network library
 # ============================================================================
 PyQt6                            # Desktop GUI application
 schedule                         # Task scheduling
+celery                           # Task queue worker (trigger indexing asynchronously)
+redis                            # Redis client / broker for Celery
 
 # ============================================================================
 # AI & Chat (RAG)

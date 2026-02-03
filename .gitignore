@@ -55,3 +55,12 @@ Desktop.ini
 
 # Project Specific
 # (Add any other specific files you want to ignore here)
+ollama/id_ed25519
+ollama/id_ed25519.pub
+qdrant_storage/.qdrant_fs_check
+qdrant_storage/raft_state.json
+qdrant_storage/aliases/data.json
+redis_data/dump.rdb
+redis_data/appendonlydir/appendonly.aof.1.base.rdb
+redis_data/appendonlydir/appendonly.aof.1.incr.aof
+redis_data/appendonlydir/appendonly.aof.manifest

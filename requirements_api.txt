@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+pydantic
+qdrant-client
+sentence-transformers
+openai
+redis
+celery
+gunicorn
+prometheus-fastapi-instrumentator
+requests
