@@ -7,6 +7,13 @@ BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://redis:6379/0")
 BACKEND_URL = os.getenv("CELERY_RESULT_BACKEND", "redis://redis:6379/1")
 
 celery_app = Celery("pypro_search", broker=BROKER_URL, backend=BACKEND_URL)
+celery_app.conf.beat_schedule = {
+    'indexare-automata-la-fiecare-ora': {
+        'task': 'pypro.indexare_incrementala',
+        'schedule': crontab(minute=0),
+    },
+}
+
 celery_app.conf.update(
     task_serializer="json",
     result_serializer="json",

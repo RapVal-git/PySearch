@@ -39,7 +39,7 @@ PyQt6                            # Desktop GUI application
 schedule                         # Task scheduling
 celery                           # Task queue worker (trigger indexing asynchronously)
 redis                            # Redis client / broker for Celery
-
+python-dotenv                    # Load environment variables from .env file
 # ============================================================================
 # AI & Chat (RAG)
 # ============================================================================

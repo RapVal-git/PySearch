@@ -65,7 +65,19 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
-
+  celery-beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pdf-celery-beat
+    command: celery -A celery_worker.celery_app beat --loglevel=info
+    env_file:
+      - .env
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - rag-network
   api-1:
     build:
       context: .

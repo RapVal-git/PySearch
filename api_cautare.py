@@ -82,7 +82,7 @@ async def startup_event():
     except Exception as e:
         print(f" RAG Engine indisponibil: {e}")
         print("   (Chat-ul nu va funcționa, dar Căutarea da)")
-
+    run_indexare_incrementala.apply_async()
     print(" API Gata de utilizare!")
 
 # ============================================================================

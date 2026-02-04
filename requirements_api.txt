@@ -9,3 +9,4 @@ celery
 gunicorn
 prometheus-fastapi-instrumentator
 requests
+python-dotenv
