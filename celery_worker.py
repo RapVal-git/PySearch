@@ -2,6 +2,7 @@
 from celery import Celery
 import config
 from indexare_incrementala import indexare_incrementala
+from celery.schedules import crontab
 
 BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://redis:6379/0")
 BACKEND_URL = os.getenv("CELERY_RESULT_BACKEND", "redis://redis:6379/1")

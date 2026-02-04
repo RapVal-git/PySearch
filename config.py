@@ -11,6 +11,8 @@ Pentru a folosi variabile de mediu (recomandat pentru producție):
 
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+load_dotenv()
 
 
 # ============================================================================
