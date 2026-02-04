@@ -29,9 +29,9 @@ app.add_middleware(
 
 # Configurare Globală (din config.py)
 collection_name = config.COLLECTION_NAME
-model = None
-client = None
-rag_engine = None
+model = SentenceTransformer(config.EMBEDDING_MODEL)
+client = config.get_qdrant_client()
+rag_engine = config.RAG_ENGINE if hasattr(config, 'RAG_ENGINE') else None
 
 # ============================================================================
 # MODELE DE DATE (Request/Response)
