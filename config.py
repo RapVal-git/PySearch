@@ -27,7 +27,7 @@ QDRANT_URL = os.getenv("QDRANT_URL", "").strip()
 # Folder implicit pentru indexare (poate fi suprascris)
 DEFAULT_INDEXING_FOLDER = os.getenv(
     "INDEXING_FOLDER",
-    os.getenv("FOLDER_PDF", r"C:\Users\IT\Desktop\Folder test")
+    os.getenv("FOLDER_PDF", "C:\Users\IT\Desktop\Folder test")
 )
 
 # Fișier pentru tracking documente indexate

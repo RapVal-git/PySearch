@@ -17,7 +17,7 @@ class RAGEngine:
         
         if provider == "openai":
             self.client = OpenAI(api_key=api_key)
-            self.model = model_name or "gpt-3.5-turbo"
+            self.model = model_name or "llama3"
         else:
             # Configurare pentru Ollama Local (din config.py)
             self.client = OpenAI(
